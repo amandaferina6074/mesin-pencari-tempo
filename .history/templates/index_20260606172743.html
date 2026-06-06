@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Mesin Pencari Berita</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding-top: 100px; background-color: #f4f7f6; }
+        .search-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .search-box { padding: 12px; width: 70%; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-cari { padding: 12px 20px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; margin-left: 10px; }
+        .btn-cari:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h2>Pencarian Berita Tempo</h2>
+        <form action="/search" method="POST">
+            <input type="text" name="query" class="search-box" placeholder="Ketik kata kunci di sini..." required>
+            <button type="submit" class="btn-cari">Cari</button>
+        </form>
+    </div>
+</body>
+</html>
