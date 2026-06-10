@@ -1,173 +1,222 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesin Pencari Berita Tempo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesin Pencari Berita Tempo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0ede8;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
+    :root {
+      --bg: #f2efe9;
+      --surface: #ffffff;
+      --ink: #141210;
+      --ink-2: #5a5650;
+      --ink-3: #9a9590;
+      --accent: #c0392b;
+      --accent-soft: #faeae8;
+      --border: #e4dfd8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 12px 40px rgba(0,0,0,.07);
+      --radius: 16px;
+    }
 
-        .masthead {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
-        .masthead-kicker {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            color: #8a7f72;
-            margin-bottom: .6rem;
-        }
+    /* ── NAV ── */
+    .nav {
+      background: var(--ink);
+      padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: -.01em; }
+    .brand em { color: var(--accent); font-style: normal; }
+    .nav-badges { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .badge { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: #9ca3af; border: 1px solid #2d2d2d; border-radius: 999px; padding: 5px 12px; }
 
-        .masthead-title {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: clamp(2.4rem, 6vw, 3.8rem);
-            font-weight: 700;
-            color: #1a1714;
-            line-height: 1.05;
-            letter-spacing: -.02em;
-        }
+    /* ── HERO ── */
+    .hero {
+      background: var(--ink);
+      border-top: 1px solid #2a2a2a;
+      padding: 4rem 1.5rem 8rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -50% -20%;
+      height: 300px;
+      background: radial-gradient(circle, rgba(192,57,43,.2), transparent 65%);
+      pointer-events: none;
+    }
+    .hero-kicker {
+      font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: #5a5650; margin-bottom: 1.2rem; position: relative; z-index: 1;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 8vw, 4.2rem);
+      font-weight: 700; color: #f5f0e8;
+      line-height: 1.05; letter-spacing: -.03em;
+      position: relative; z-index: 1;
+    }
+    .hero-title em { color: var(--accent); font-style: normal; }
+    .hero-sub {
+      margin: 1.1rem auto 0; max-width: 580px;
+      color: #4a4540; font-size: 15px; line-height: 1.7;
+      position: relative; z-index: 1;
+    }
 
-        .masthead-title span { color: #c0392b; }
+    /* ── MAIN WRAP ── */
+    .wrap {
+      max-width: 860px;
+      margin: -5rem auto 0;
+      padding: 0 1.5rem 5rem;
+      position: relative; z-index: 5;
+    }
 
-        .masthead-rule {
-            width: 48px;
-            height: 2px;
-            background: #c0392b;
-            margin: 1.2rem auto 0;
-        }
+    /* ── SEARCH CARD ── */
+    .search-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
 
-        .search-card {
-            width: 100%;
-            max-width: 620px;
-            background: #fff;
-            border-radius: 4px;
-            padding: 2rem 2rem 2.25rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08);
-        }
+    .form-row { display: flex; gap: .75rem; }
+    .search-icon {
+      width: 56px; height: 56px; flex-shrink: 0;
+      background: var(--bg); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink-3);
+    }
+    .search-input {
+      flex: 1; height: 56px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 1.1rem; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink);
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input::placeholder { color: var(--ink-3); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(192,57,43,.1); background: #fff; }
+    .search-btn {
+      height: 56px; padding: 0 1.5rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      display: flex; align-items: center; gap: .5rem;
+      transition: background .15s, transform .1s;
+    }
+    .search-btn:hover { background: #a93226; }
+    .search-btn:active { transform: scale(.98); }
 
-        .search-card label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: #8a7f72;
-            margin-bottom: .6rem;
-        }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
 
-        .input-row { display: flex; gap: 10px; }
+    .option-row { display: flex; align-items: center; gap: .75rem; font-size: 14px; color: var(--ink-2); }
+    .toggle {
+      appearance: none; width: 46px; height: 28px; flex-shrink: 0;
+      background: #ddd; border-radius: 999px; border: 2px solid #ccc;
+      position: relative; cursor: pointer; transition: background .2s, border-color .2s;
+    }
+    .toggle::after {
+      content: ""; width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; position: absolute; top: 2px; left: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s;
+    }
+    .toggle:checked { background: var(--accent); border-color: var(--accent); }
+    .toggle:checked::after { left: 22px; }
+    .option-row strong { color: var(--ink); }
 
-        .search-input {
-            flex: 1;
-            padding: 13px 16px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            color: #1a1714;
-            background: #faf9f7;
-            border: 1px solid #d8d3cc;
-            border-radius: 3px;
-            outline: none;
-            transition: border-color .15s, box-shadow .15s;
-        }
+    .hint {
+      margin-top: 1rem; font-size: 12px; color: var(--ink-3);
+      display: flex; align-items: flex-start; gap: .5rem;
+    }
+    .hint-icon {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border: 1px solid var(--border); border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: var(--ink-3); margin-top: 1px;
+    }
 
-        .search-input::placeholder { color: #b0a99f; }
+    /* ── INFO CARDS ── */
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .info-card {
+      background: var(--ink);
+      color: #fff; border-radius: var(--radius);
+      padding: 1.3rem 1.4rem;
+      border: 1px solid #2a2a2a;
+    }
+    .info-card small {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: #5a5650; display: block; margin-bottom: .4rem;
+    }
+    .info-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 700; color: #f5f0e8;
+    }
 
-        .search-input:focus {
-            border-color: #c0392b;
-            box-shadow: 0 0 0 3px rgba(192,57,43,.12);
-            background: #fff;
-        }
-
-        .btn-cari {
-            padding: 13px 22px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: .04em;
-            color: #fff;
-            background: #c0392b;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background .15s, transform .1s;
-        }
-
-        .btn-cari:hover { background: #a93226; }
-        .btn-cari:active { transform: scale(.98); }
-
-        .search-hint {
-            margin-top: 1rem;
-            font-size: 12px;
-            color: #a09790;
-        }
-
-        .search-hint strong {
-            color: #6e6560;
-            font-weight: 500;
-        }
-
-        .footer {
-            margin-top: 2rem;
-            font-size: 12px;
-            color: #a09790;
-            letter-spacing: .03em;
-        }
-
-        @media (max-width: 480px) {
-            .input-row { flex-direction: column; }
-            .btn-cari { width: 100%; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; }
-        }
-    </style>
+    @media (max-width: 600px) {
+      .nav { padding: 1rem; }
+      .hero { padding: 3rem 1rem 7rem; }
+      .wrap { padding: 0 1rem 4rem; }
+      .info-grid { grid-template-columns: 1fr; }
+      .form-row { flex-wrap: wrap; }
+      .search-btn { width: 100%; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="masthead">
-        <p class="masthead-kicker">Mesin Pencari</p>
-        <h1 class="masthead-title">Berita <span>Tempo</span></h1>
-        <div class="masthead-rule"></div>
-    </div>
+<nav class="nav">
+  <a class="brand" href="/">Berita <em>Tempo</em></a>
+  <div class="nav-badges">
+    <span class="badge">{{ total_artikel }} artikel</span>
+    <span class="badge">{{ total_kata_unik }} kata unik</span>
+    <span class="badge">active</span>
+  </div>
+</nav>
 
-    <div class="search-card">
-        <label for="query">Kata kunci</label>
-        <form action="/search" method="POST">
-            <div class="input-row">
-                <input
-                    type="text"
-                    id="query"
-                    name="query"
-                    class="search-input"
-                    placeholder="cth. pemilu, ekonomi, teknologi…"
-                    autocomplete="off"
-                    required
-                >
-                <button type="submit" class="btn-cari">Cari →</button>
-            </div>
-        </form>
-        <p class="search-hint">Coba: <strong>kebijakan fiskal</strong> · <strong>pilkada 2024</strong> · <strong>startup Indonesia</strong></p>
-    </div>
+<section class="hero">
+  <p class="hero-kicker">Sistem Temu Kembali Informasi</p>
+  <h1 class="hero-title">Mesin Pencari<br><em>Berita Tempo</em></h1>
+  <p class="hero-sub">Berbasis TF-IDF, Cosine Similarity, Query Expansion, dan evaluasi kinerja pencarian.</p>
+</section>
 
-    <p class="footer">© 2025 Tempo Media · Semua hak dilindungi</p>
+<main class="wrap">
+  <form class="search-card" action="/search" method="POST">
+    <div class="form-row">
+      <div class="search-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <input class="search-input" type="text" name="query" placeholder="cth. Indonesia, Prabowo, Ekonomi…" autocomplete="off" required>
+      <button class="search-btn" type="submit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Cari
+      </button>
+    </div>
+    <hr class="divider">
+    <label class="option-row">
+      <input class="toggle" type="checkbox" name="use_synonym">
+      <span><strong>Query Expansion</strong> — pencarian dengan sinonim</span>
+    </label>
+    <p class="hint">
+      <span class="hint-icon">!</span>
+      Klik judul berita pada hasil pencarian untuk membuka sumber asli.
+    </p>
+  </form>
+
+  <div class="info-grid">
+    <div class="info-card"><small>Metode</small><h3>TF-IDF</h3></div>
+    <div class="info-card"><small>Kemiripan</small><h3>Cosine</h3></div>
+    <div class="info-card"><small>Output</small><h3>Top 10</h3></div>
+  </div>
+</main>
 
 </body>
 </html>

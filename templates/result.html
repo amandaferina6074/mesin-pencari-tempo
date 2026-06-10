@@ -1,245 +1,309 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Pencarian: {{ query }} — Tempo</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
-    <style>
-        /* Reset dasar */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hasil Pencarian: {{ query }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f0ede8; /* Warna latar yang sama dengan index.html */
-            min-height: 100vh;
-            padding: 2.5rem 1.5rem 4rem;
-            color: #1a1714;
-        }
+    :root {
+      --bg: #f2efe9;
+      --surface: #ffffff;
+      --ink: #141210;
+      --ink-2: #5a5650;
+      --ink-3: #9a9590;
+      --accent: #c0392b;
+      --accent-soft: #faeae8;
+      --blue: #2563eb;
+      --blue-soft: #eff4ff;
+      --green: #16a34a;
+      --green-soft: #f0faf4;
+      --orange: #ea580c;
+      --orange-soft: #fff4ee;
+      --border: #e4dfd8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 12px 40px rgba(0,0,0,.07);
+      --radius: 16px;
+    }
 
-        .container {
-            max-width: 760px;
-            margin: 0 auto;
-        }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
-        /* Bagian Atas (Header & Tombol Kembali) */
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
+    /* ── NAV ── */
+    .nav {
+      background: var(--ink);
+      padding: 1rem 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: -.01em; }
+    .brand em { color: var(--accent); font-style: normal; }
+    .nav-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+    .badge { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: #9ca3af; border: 1px solid #2d2d2d; border-radius: 999px; padding: 5px 12px; }
+    .btn-back { font-size: 13px; font-weight: 500; color: #d1cfc9; text-decoration: none; border: 1px solid #3a3a3a; border-radius: 999px; padding: 7px 16px; transition: color .15s, border-color .15s; }
+    .btn-back:hover { color: #fff; border-color: #666; }
 
-        .brand {
-            text-decoration: none;
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1714;
-            letter-spacing: -.02em;
-        }
-        
-        .brand span { color: #c0392b; } /* Aksen merah tempo */
+    /* ── LAYOUT ── */
+    .page { max-width: 1040px; margin: 0 auto; padding: 2rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 1.5rem; }
 
-        .btn-back {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: #8a7f72;
-            text-decoration: none;
-            padding: 10px 18px;
-            border: 1px solid #d8d3cc;
-            background: #faf9f7;
-            border-radius: 3px;
-            transition: all .15s ease;
-        }
-        
-        .btn-back:hover {
-            background: #fff;
-            border-color: #c0392b;
-            color: #c0392b;
-        }
+    /* ── SEARCH CARD ── */
+    .search-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+    .form-row { display: flex; gap: .75rem; }
+    .search-icon {
+      width: 52px; height: 52px; flex-shrink: 0;
+      background: var(--bg); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ink-3);
+    }
+    .search-input {
+      flex: 1; height: 52px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0 1rem; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink);
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
+    .search-btn {
+      height: 52px; padding: 0 1.5rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: background .15s;
+    }
+    .search-btn:hover { background: #a93226; }
 
-        /* Judul Hasil Pencarian */
-        .results-header {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
+    .option-row { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; font-size: 14px; color: var(--ink-2); }
+    .toggle {
+      appearance: none; width: 44px; height: 26px; flex-shrink: 0;
+      background: #ddd; border-radius: 999px; border: 2px solid #ccc;
+      position: relative; cursor: pointer; transition: background .2s, border-color .2s;
+    }
+    .toggle::after {
+      content: ""; width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; position: absolute; top: 2px; left: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s;
+    }
+    .toggle:checked { background: var(--accent); border-color: var(--accent); }
+    .toggle:checked::after { left: 22px; }
+    .option-row strong { color: var(--ink); }
+    .query-expanded { margin-top: .6rem; font-size: 13px; color: var(--ink-3); }
+    .query-expanded strong { color: var(--ink-2); }
 
-        .results-header h2 {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-size: clamp(1.8rem, 4vw, 2.4rem);
-            font-weight: 700;
-            color: #1a1714;
-            line-height: 1.2;
-        }
+    /* ── METRICS PANEL ── */
+    .metrics-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .metrics-head {
+      background: var(--ink);
+      padding: 1.1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .metrics-head-left { display: flex; align-items: center; gap: .75rem; }
+    .metrics-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .metrics-label { font-weight: 700; font-size: 1rem; color: #fff; }
+    .metrics-query { font-family: 'Playfair Display', serif; font-style: italic; color: #8a8a8a; font-size: .95rem; }
 
-        .results-header h2 em {
-            color: #c0392b;
-            font-style: italic;
-        }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+    .metric-cell { background: var(--surface); padding: 1.4rem; text-align: center; }
+    .metric-kicker { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: .5rem; }
+    .metric-value { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 700; line-height: 1; margin-bottom: .4rem; }
+    .metric-value.green { color: var(--green); }
+    .metric-value.orange { color: var(--orange); }
+    .metric-value.blue { color: var(--blue); }
+    .metric-sub { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
 
-        .rule {
-            width: 48px;
-            height: 2px;
-            background: #c0392b;
-            margin: 1.5rem auto 2.5rem;
-            border: none;
-        }
+    .confusion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+    .conf-cell { padding: 1.1rem; text-align: center; }
+    .conf-cell h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: .25rem; }
+    .conf-cell strong { display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .2rem; }
+    .conf-cell span { font-size: 12px; }
+    .tp { background: var(--green-soft); color: var(--green); }
+    .fp { background: #fff0f1; color: #b91c1c; }
+    .fn { background: var(--orange-soft); color: var(--orange); }
+    .tr { background: var(--blue-soft); color: var(--blue); }
 
-        /* Kartu Berita */
-        .result-card {
-            background: #fff;
-            border-radius: 4px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
+    .formula-row {
+      padding: .9rem 1.5rem;
+      font-size: 12px; color: var(--ink-3);
+      border-top: 1px solid var(--border);
+      font-family: 'Courier New', monospace;
+      background: var(--bg);
+    }
 
-        .result-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.12);
-        }
+    /* ── RESULT CARDS ── */
+    .results-header { display: flex; align-items: baseline; gap: .75rem; }
+    .results-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); }
+    .results-title em { font-style: italic; color: var(--accent); }
+    .results-count { font-size: 13px; color: var(--ink-3); }
 
-        /* Informasi Metadata Berita (Peringkat & Skor) */
-        .result-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1rem;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
+    .result-list { display: flex; flex-direction: column; gap: .75rem; }
 
-        .result-rank {
-            background: #f0ede8;
-            color: #8a7f72;
-            padding: 4px 10px;
-            border-radius: 3px;
-        }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .card:hover { box-shadow: var(--shadow-md); border-color: #d0c9c0; }
 
-        .result-score {
-            color: #c0392b;
-        }
+    .card-meta { display: flex; align-items: center; gap: .6rem; margin-bottom: .75rem; }
+    .rank-badge {
+      font-size: 11px; font-weight: 700; letter-spacing: .06em;
+      color: var(--accent); background: var(--accent-soft);
+      border-radius: 999px; padding: 4px 10px;
+    }
+    .score-wrap { display: flex; align-items: center; gap: 6px; }
+    .score-bar-bg { width: 56px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .score-bar-fill { height: 100%; background: var(--green); border-radius: 99px; }
+    .score-text { font-size: 11px; font-weight: 600; color: var(--green); }
 
-        .result-title {
-            font-size: 1.35rem;
-            font-weight: 600;
-            line-height: 1.35;
-            margin-bottom: 0.8rem;
-        }
+    .card-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); line-height: 1.4; margin-bottom: .5rem; }
+    .card-title a { text-decoration: none; color: inherit; }
+    .card-title a:hover { color: var(--accent); }
+    .card-snippet { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; margin-bottom: .85rem; }
+    .card-read { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+    .card-read:hover { text-decoration: underline; }
 
-        /* Efek Hover untuk Judul yang memiliki Link */
-        .result-title a {
-            color: #1a1714;
-            text-decoration: none;
-            transition: color 0.15s ease;
-        }
+    .empty-state {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 3.5rem 2rem; text-align: center;
+    }
+    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--ink); margin-bottom: .5rem; }
+    .empty-state p { font-size: 14px; color: var(--ink-3); }
 
-        .result-title a:hover {
-            color: #c0392b;
-        }
-
-        .result-snippet {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #554f49;
-            margin-bottom: 1.2rem; /* Ruang tambahan antara teks dan tombol */
-        }
-
-        /* Tombol Baca Selengkapnya */
-        .read-more {
-            font-size: 13px;
-            font-weight: 600;
-            color: #c0392b;
-            text-decoration: none;
-        }
-        
-        .read-more:hover {
-            text-decoration: underline;
-        }
-
-        /* Tampilan jika kosong */
-        .empty-state {
-            background: #fff;
-            padding: 4rem 2rem;
-            text-align: center;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,.06);
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            color: #554f49;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer {
-            margin-top: 3rem;
-            text-align: center;
-            font-size: 12px;
-            color: #a09790;
-            letter-spacing: .03em;
-        }
-
-        @media (max-width: 480px) {
-            .result-card { padding: 1.5rem; }
-        }
-    </style>
+    @media (max-width: 720px) {
+      .nav { padding: 1rem; }
+      .page { padding: 1.25rem 1rem 4rem; }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .confusion-grid { grid-template-columns: 1fr 1fr; }
+      .metrics-head { flex-direction: column; align-items: flex-start; }
+      .form-row { flex-wrap: wrap; }
+      .search-btn { width: 100%; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <div class="topbar">
-            <a href="/" class="brand">Berita <span>Tempo</span></a>
-            <a href="/" class="btn-back">← Kembali</a>
+<nav class="nav">
+  <a class="brand" href="/">Berita <em>Tempo</em></a>
+  <div class="nav-right">
+    <span class="badge">{{ total_artikel }} artikel</span>
+    <span class="badge">{{ total_kata_unik }} kata unik</span>
+    <a class="btn-back" href="/">← Kembali</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Search -->
+  <div class="search-card">
+    <form action="/search" method="POST">
+      <div class="form-row">
+        <div class="search-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         </div>
+        <input class="search-input" type="text" name="query" value="{{ query }}" placeholder="Cari berita…" required>
+        <button class="search-btn" type="submit">Cari →</button>
+      </div>
+      <label class="option-row">
+        <input class="toggle" type="checkbox" name="use_synonym" {% if use_synonym %}checked{% endif %}>
+        <span><strong>Query Expansion</strong> — pencarian dengan sinonim</span>
+      </label>
+    </form>
+    {% if use_synonym %}
+    <p class="query-expanded">Query diperluas: <strong>{{ query_final }}</strong></p>
+    {% endif %}
+  </div>
 
-        <div class="results-header">
-            <h2>Hasil untuk <em>"{{ query }}"</em></h2>
-            <hr class="rule">
-        </div>
-
-        <div class="results-list">
-            {% if results %}
-                {% for item in results %}
-                <div class="result-card">
-                    <div class="result-meta">
-                        <span class="result-rank">#{{ loop.index }}</span>
-                        <span>•</span>
-                        <span class="result-score">Skor Relevansi: {{ item.skor }}</span>
-                    </div>
-                    
-                    <h3 class="result-title">
-                        <a href="{{ item.url }}" target="_blank">{{ item.judul }}</a>
-                    </h3>
-                    
-                    <p class="result-snippet">{{ item.isi }}</p>
-                    
-                    <a href="{{ item.url }}" target="_blank" class="read-more">Baca di situs Tempo &rarr;</a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <p>Tidak ada berita yang relevan untuk kata kunci "<strong>{{ query }}</strong>".</p>
-                    <a href="/" class="btn-back">Coba Kata Kunci Lain</a>
-                </div>
-            {% endif %}
-        </div>
-
-        <p class="footer">© 2026 Sistem IR Berita Tempo · Dibuat untuk Tugas Akhir</p>
-
+  <!-- Metrics -->
+  <div class="metrics-panel">
+    <div class="metrics-head">
+      <div class="metrics-head-left">
+        <div class="metrics-icon">⌁</div>
+        <span class="metrics-label">Evaluasi Kinerja</span>
+      </div>
+      <span class="metrics-query">"{{ query }}"</span>
     </div>
 
+    <div class="metrics-grid">
+      <div class="metric-cell">
+        <div class="metric-kicker">Precision</div>
+        <div class="metric-value green">{{ metrics.precision }}%</div>
+        <div class="metric-sub">{{ metrics.tp }} / {{ metrics.retrieved }}<br>Dokumen relevan terambil</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-kicker">Recall</div>
+        <div class="metric-value orange">{{ metrics.recall }}%</div>
+        <div class="metric-sub">{{ metrics.tp }} / {{ metrics.total_relevant }}<br>Dari total relevan</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-kicker">F1-Score</div>
+        <div class="metric-value blue">{{ metrics.f1 }}%</div>
+        <div class="metric-sub">Harmonic mean<br>Precision dan Recall</div>
+      </div>
+    </div>
+
+    <div class="confusion-grid">
+      <div class="conf-cell tp"><h3>{{ metrics.tp }}</h3><strong>True Positive</strong><span>Relevan + Terambil</span></div>
+      <div class="conf-cell fp"><h3>{{ metrics.fp }}</h3><strong>False Positive</strong><span>Tidak Relevan + Terambil</span></div>
+      <div class="conf-cell fn"><h3>{{ metrics.fn }}</h3><strong>False Negative</strong><span>Relevan + Tidak Terambil</span></div>
+      <div class="conf-cell tr"><h3>{{ metrics.total_relevant }}</h3><strong>Total Relevan</strong><span>Ground Truth DB</span></div>
+    </div>
+
+    <div class="formula-row">
+      Precision = TP / (TP+FP) &nbsp;·&nbsp; Recall = TP / (TP+FN) &nbsp;·&nbsp; F1 = 2×P×R / (P+R)
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-header">
+    <h2 class="results-title">Hasil untuk: "<em>{{ query }}</em>"</h2>
+    {% if results %}<span class="results-count">{{ results|length }} berita</span>{% endif %}
+  </div>
+
+  <div class="result-list">
+    {% if results %}
+      {% for item in results %}
+      <article class="card">
+        <div class="card-meta">
+          <span class="rank-badge">#{{ loop.index }}</span>
+          <div class="score-wrap">
+            <div class="score-bar-bg">
+              <div class="score-bar-fill" style="width:{{ (item.skor * 100)|round|int }}%"></div>
+            </div>
+            <span class="score-text">{{ item.skor }}</span>
+          </div>
+        </div>
+        <h2 class="card-title"><a href="{{ item.url }}" target="_blank">{{ item.judul }}</a></h2>
+        <p class="card-snippet">{{ item.isi }}</p>
+        <a class="card-read" href="{{ item.url }}" target="_blank">Baca di Tempo →</a>
+      </article>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <h2>Tidak ada hasil relevan.</h2>
+        <p>Coba kata kunci lain atau aktifkan Query Expansion.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
 </body>
 </html>
