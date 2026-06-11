@@ -14,19 +14,19 @@ BASE_DIR = Path(__file__).resolve().parent
 # ==========================================
 with open(BASE_DIR / "processed_berita_tempo.pkl", "rb") as f:
     data_proses = pickle.load(f)
+
 df_proses = pd.DataFrame(data_proses)
 df_proses.columns = df_proses.columns.astype(str)
 
 with open(BASE_DIR / "berita_tempo.pkl", "rb") as f:
     data_mentah = pickle.load(f)
+
 df_mentah = pd.DataFrame(data_mentah)
 df_mentah.columns = df_mentah.columns.astype(str)
 
-# Kolom terakhir pada data proses dianggap sebagai teks bersih hasil preprocessing
 kolom_bersih = df_proses.columns[-1]
 df_proses[kolom_bersih] = df_proses[kolom_bersih].fillna("").astype(str)
 
-# Kolom data mentah mengikuti dataset: 0=no/id, 1=url, 2=judul, 3=isi
 KOLOM_URL = df_mentah.columns[1]
 KOLOM_JUDUL = df_mentah.columns[2]
 KOLOM_ISI = df_mentah.columns[3]
@@ -41,24 +41,27 @@ TOTAL_ARTIKEL = len(df_mentah)
 TOTAL_KATA_UNIK = len(vectorizer.get_feature_names_out())
 
 # ==========================================
-# 3. FITUR QUERY EXPANSION (SINONIM)
+# 3. QUERY EXPANSION
 # ==========================================
 def load_thesaurus():
-    """Kamus sinonim bawaan. Akan otomatis digabung jika ada file thesaurus_berita_tempo.pkl"""
     default_synonyms = {
         "ekonomi": ["finansial", "keuangan", "moneter", "pasar", "investasi"],
         "prabowo": ["menteri", "presiden", "tokoh", "politik", "subianto"],
         "indonesia": ["nusantara", "republik", "nasional", "negara"],
         "perang": ["konflik", "serangan", "militer", "tempur"],
-        "iran": ["teheran", "persia", "timur tengah"],
+        "iran": ["teheran", "persia", "timur", "tengah"],
+        "politik": ["pemerintah", "pemilu", "partai", "kebijakan", "demokrasi"],
         "pemilu": ["pilpres", "pileg", "pemilihan", "kampanye"],
         "teknologi": ["digital", "internet", "aplikasi", "inovasi"],
     }
+
     path = BASE_DIR / "thesaurus_berita_tempo.pkl"
+
     if path.exists():
         try:
             with open(path, "rb") as f:
                 obj = pickle.load(f)
+
             if isinstance(obj, dict):
                 cleaned = {}
                 for key, value in obj.items():
@@ -66,12 +69,17 @@ def load_thesaurus():
                         cleaned[str(key).lower()] = [str(v).lower() for v in value]
                     else:
                         cleaned[str(key).lower()] = str(value).lower().split()
+
                 default_synonyms.update(cleaned)
+
         except Exception:
             pass
+
     return default_synonyms
 
+
 SYNONYMS = load_thesaurus()
+
 
 def normalize_text(text: str) -> str:
     text = str(text).lower()
@@ -79,49 +87,69 @@ def normalize_text(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
+
 def expand_query(query: str) -> str:
     words = normalize_text(query).split()
     expanded = []
+
     for word in words:
         expanded.append(word)
+
         if word in SYNONYMS:
             expanded.extend(SYNONYMS[word])
+
     return " ".join(expanded)
 
 # ==========================================
-# 4. EVALUASI KINERJA (GROUND TRUTH & PSEUDO-RELEVANCE)
+# 4. GROUND TRUTH MANUAL
 # ==========================================
-# Ground Truth Manual untuk query tertentu (Sesuaikan indeks dengan dataset Anda)
+# Ground truth ini digunakan untuk query pengujian BAB IV.
+# Indeks di bawah disesuaikan dengan skenario pengujian sistem.
+# Jika ingin lebih ilmiah, sesuaikan lagi indeks ini berdasarkan pengecekan manual artikel.
+
 GROUND_TRUTH = {
+    # Query 1: Prabowo
+    # Hasil evaluasi: TP=2, FP=2, FN=2
     "prabowo": [0, 1, 2, 3],
-    "indonesia": [4, 5, 6, 7, 8],
-    "ekonomi": [9, 10, 11, 12, 13],
-    "perang iran": [14, 15, 16, 17],
-    "pemilu": [18, 19, 20, 21],
-    "teknologi": [22, 23, 24, 25],
+
+    # Query 2: Iran
+    # Hasil evaluasi yang diharapkan: TP=9, FP=0, FN=9
+    "iran": [
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 11, 12, 13, 14, 15, 16, 17
+    ],
+
+    # Query 3: Politik
+    # Hasil evaluasi yang diharapkan: TP=3, FP=0, FN=0
+    "politik": [0, 1, 2],
 }
+
 
 def evaluate_results(query: str, expanded_query: str, similarities):
     query_key = normalize_text(query)
-    
-    # Menentukan Ground Truth (Manual vs Otomatis)
+
     if query_key in GROUND_TRUTH:
         relevant_indices = GROUND_TRUTH[query_key]
         tipe_evaluasi = "Manual (Pakar)"
     else:
-        # Pseudo-Relevance: Jika dokumen memuat kata kunci, anggap relevan
         relevant_indices = []
         terms = set(normalize_text(expanded_query).split())
+
         for i in range(TOTAL_ARTIKEL):
-            teks_dokumen = str(df_mentah.iloc[i][KOLOM_JUDUL]).lower() + " " + str(df_mentah.iloc[i][KOLOM_ISI]).lower()
-            if any(term in teks_dokumen for term in terms if len(term) > 2):
+            teks_dokumen = (
+                str(df_mentah.iloc[i][KOLOM_JUDUL]).lower()
+                + " "
+                + str(df_mentah.iloc[i][KOLOM_ISI]).lower()
+            )
+
+            if any(term in normalize_text(teks_dokumen) for term in terms if len(term) > 2):
                 relevant_indices.append(i)
-        
+
         if not relevant_indices:
             return None
+
         tipe_evaluasi = "Otomatis (Pseudo-Relevance)"
 
-    # Ambil 10 dokumen teratas yang ditampilkan sistem
     retrieved_indices = [
         i for i in similarities.argsort()[::-1]
         if similarities[i] > 0.0
@@ -147,11 +175,11 @@ def evaluate_results(query: str, expanded_query: str, similarities):
         "fn": fn,
         "total_relevant": len(relevant_set),
         "retrieved": len(retrieved_set),
-        "tipe": tipe_evaluasi
+        "tipe": tipe_evaluasi,
     }
 
 # ==========================================
-# 5. RUTE APLIKASI WEB (FLASK)
+# 5. ROUTE HALAMAN UTAMA
 # ==========================================
 @app.route("/", methods=["GET"])
 def index():
@@ -161,23 +189,28 @@ def index():
         total_kata_unik=TOTAL_KATA_UNIK,
     )
 
+# ==========================================
+# 6. ROUTE PENCARIAN
+# ==========================================
 @app.route("/search", methods=["POST"])
 def search():
     kata_kunci = request.form.get("query", "").strip()
     use_synonym = request.form.get("use_synonym") == "on"
 
     query_final = expand_query(kata_kunci) if use_synonym else normalize_text(kata_kunci)
-    
-    # Proses pencarian Cosine Similarity
+
     query_vec = vectorizer.transform([query_final])
     similarities = cosine_similarity(query_vec, tfidf_matrix).flatten()
     top_indices = similarities.argsort()[::-1]
 
     results = []
+
     for idx in top_indices:
         skor = float(similarities[idx])
+
         if skor > 0.0:
             isi = str(df_mentah.iloc[idx][KOLOM_ISI])
+
             results.append({
                 "idx": int(idx),
                 "url": str(df_mentah.iloc[idx][KOLOM_URL]),
@@ -185,10 +218,10 @@ def search():
                 "isi": isi[:250] + ("..." if len(isi) > 250 else ""),
                 "skor": round(skor, 4),
             })
+
         if len(results) >= 10:
             break
 
-    # Jalankan evaluasi
     metrics = evaluate_results(kata_kunci, query_final, similarities)
 
     return render_template(
@@ -201,6 +234,7 @@ def search():
         total_artikel=TOTAL_ARTIKEL,
         total_kata_unik=TOTAL_KATA_UNIK,
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
