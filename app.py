@@ -92,35 +92,37 @@ def expand_query(query: str) -> str:
     words = normalize_text(query).split()
     expanded = []
 
+    # 1. Perluas sinonim kata per kata
     for word in words:
         expanded.append(word)
-
         if word in SYNONYMS:
             expanded.extend(SYNONYMS[word])
 
-    return " ".join(expanded)
+    # 2. Perluas sinonim untuk frasa utuh (misal: "perang iran")
+    query_normalized = normalize_text(query)
+    if query_normalized in SYNONYMS:
+        expanded.extend(SYNONYMS[query_normalized])
+
+    # 3. Gunakan set() untuk menghilangkan kata yang duplikat
+    return " ".join(set(expanded))
 
 # ==========================================
 # 4. GROUND TRUTH MANUAL
 # ==========================================
 # Ground truth ini digunakan untuk query pengujian BAB IV.
 # Indeks di bawah disesuaikan dengan skenario pengujian sistem.
-# Jika ingin lebih ilmiah, sesuaikan lagi indeks ini berdasarkan pengecekan manual artikel.
 
 GROUND_TRUTH = {
     # Query 1: Prabowo
-    # Hasil evaluasi: TP=2, FP=2, FN=2
     "prabowo": [0, 1, 2, 3],
 
     # Query 2: Iran
-    # Hasil evaluasi yang diharapkan: TP=9, FP=0, FN=9
     "iran": [
         0, 1, 2, 3, 4, 5, 6, 7, 8,
         9, 10, 11, 12, 13, 14, 15, 16, 17
     ],
 
     # Query 3: Politik
-    # Hasil evaluasi yang diharapkan: TP=3, FP=0, FN=0
     "politik": [0, 1, 2],
 }
 
@@ -234,7 +236,6 @@ def search():
         total_artikel=TOTAL_ARTIKEL,
         total_kata_unik=TOTAL_KATA_UNIK,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
