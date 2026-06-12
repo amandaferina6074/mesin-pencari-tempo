@@ -91,16 +91,10 @@ def expand_query(query: str) -> str:
 # ==========================================
 # 4. GROUND TRUTH MANUAL & EVALUASI
 # ==========================================
-# Ground truth ini disesuaikan dengan topik Prabowo, Indonesia, dan Ekonomi
 GROUND_TRUTH = {
-    # Query: Prabowo
-    "prabowo": [0, 1, 4, 5], 
-    
-    # Query: Indonesia
-    "indonesia": [0, 3, 4, 5, 10, 11, 15, 17, 18, 19, 28, 30, 33, 34, 37, 44],
-    
-    # Query: Ekonomi
-    "ekonomi": [11, 12, 13, 14, 49],
+    "prabowo": [0, 1, 2, 3],
+    "iran": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+    "politik": [0, 1, 2],
 }
 
 
