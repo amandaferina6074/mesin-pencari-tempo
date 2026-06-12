@@ -48,15 +48,11 @@ def load_thesaurus():
         "ekonomi": ["finansial", "keuangan", "moneter", "pasar", "investasi"],
         "prabowo": ["menteri", "presiden", "tokoh", "politik", "subianto"],
         "indonesia": ["nusantara", "republik", "nasional", "negara"],
-        "perang": ["konflik", "serang", "militer", "tempur"], # <--- Sudah diubah ke kata dasar "serang"
-        "iran": ["teheran", "persia", "timur", "tengah"], # <--- Dipisah agar lebih aman dibaca mesin
+        "perang": ["konflik", "serangan", "militer", "tempur"],
+        "iran": ["teheran", "persia", "timur", "tengah"],
         "politik": ["pemerintah", "pemilu", "partai", "kebijakan", "demokrasi"],
         "pemilu": ["pilpres", "pileg", "pemilihan", "kampanye"],
         "teknologi": ["digital", "internet", "aplikasi", "inovasi"],
-        "abdul mu'ti": ["menteri", "pendidikan", "kemdikbud", "tokoh"],
-        "jepang": ["wna", "asing", "internasional", "tokyo"],
-        "penipuan online": ["siber", "cyber", "ilegal", "polisi", "imigrasi", "kriminal", "kejahatan"],
-        "pendidikan": ["guru", "sekolah", "pelatihan", "siswa", "belajar"]
     }
 
     path = BASE_DIR / "thesaurus_berita_tempo.pkl"
