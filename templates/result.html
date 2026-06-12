@@ -5,305 +5,378 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hasil Pencarian: {{ query }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
+      /* Tema Warna Lama (Koran Klasik Tempo) */
       --bg: #f2efe9;
       --surface: #ffffff;
-      --ink: #141210;
-      --ink-2: #5a5650;
-      --ink-3: #9a9590;
-      --accent: #c0392b;
-      --accent-soft: #faeae8;
-      --blue: #2563eb;
-      --blue-soft: #eff4ff;
-      --green: #16a34a;
-      --green-soft: #f0faf4;
-      --orange: #ea580c;
-      --orange-soft: #fff4ee;
+      --text-main: #141210;
+      --text-muted: #5a5650;
+      --text-light: #9a9590;
+      
+      --primary: #c0392b; /* Merah Accent */
+      --primary-hover: #a93226;
+      --primary-soft: #faeae8;
+      
+      --success: #16a34a; /* Hijau */
+      --success-soft: #f0faf4;
+      
+      --warning: #ea580c; /* Oranye */
+      --warning-soft: #fff4ee;
+      
+      --danger: #b91c1c; /* Merah (untuk False Positive) */
+      --danger-soft: #fff0f1;
+      
+      --info: #2563eb; /* Biru (untuk Total Relevan / F1) */
+      --info-soft: #eff4ff;
+
       --border: #e4dfd8;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06);
-      --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 12px 40px rgba(0,0,0,.07);
-      --radius: 16px;
+      --radius: 8px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
 
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
-
-    /* ── NAV ── */
-    .nav {
-      background: var(--ink);
-      padding: 1rem 2rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: var(--bg); 
+      color: var(--text-main); 
+      line-height: 1.5;
     }
-    .brand { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: -.01em; }
-    .brand em { color: var(--accent); font-style: normal; }
-    .nav-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
-    .badge { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: #9ca3af; border: 1px solid #2d2d2d; border-radius: 999px; padding: 5px 12px; }
-    .btn-back { font-size: 13px; font-weight: 500; color: #d1cfc9; text-decoration: none; border: 1px solid #3a3a3a; border-radius: 999px; padding: 7px 16px; transition: color .15s, border-color .15s; }
-    .btn-back:hover { color: #fff; border-color: #666; }
 
-    /* ── LAYOUT ── */
-    .page { max-width: 1040px; margin: 0 auto; padding: 2rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    /* ── HEADER NAVBAR (Dikembalikan Gelap) ── */
+    .navbar {
+      background: var(--text-main);
+      border-bottom: 1px solid #000;
+      padding: 1rem 5%;
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .brand-logo { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 1.5rem; 
+      font-weight: 700; 
+      color: #ffffff; 
+      text-decoration: none; 
+      letter-spacing: -0.01em;
+    }
+    .brand-logo span { color: var(--primary); font-style: italic; font-weight: 400; }
+    
+    .nav-stats { display: flex; gap: 1rem; align-items: center; }
+    .stat-badge { 
+      font-size: 0.75rem; 
+      background: transparent; 
+      color: #9ca3af; 
+      padding: 0.35rem 0.75rem; 
+      border-radius: 999px; 
+      border: 1px solid #2d2d2d;
+      letter-spacing: 0.05em;
+    }
+    .btn-outline {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #d1cfc9;
+      text-decoration: none;
+      border: 1px solid #3a3a3a;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: #3a3a3a; color: #fff; }
 
-    /* ── SEARCH CARD ── */
-    .search-card {
+    /* ── MAIN CONTAINER ── */
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    /* ── SEARCH SECTION ── */
+    .search-wrapper {
       background: var(--surface);
+      padding: 1.5rem;
       border-radius: var(--radius);
-      padding: 1.25rem;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
       border: 1px solid var(--border);
     }
-    .form-row { display: flex; gap: .75rem; }
-    .search-icon {
-      width: 52px; height: 52px; flex-shrink: 0;
-      background: var(--bg); border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--ink-3);
-    }
+    .search-box { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
     .search-input {
-      flex: 1; height: 52px;
-      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 0 1rem; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--ink);
-      outline: none; transition: border-color .15s, box-shadow .15s;
-    }
-    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
-    .search-btn {
-      height: 52px; padding: 0 1.5rem;
-      background: var(--accent); color: #fff;
-      border: none; border-radius: 10px;
-      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
-      cursor: pointer; white-space: nowrap; transition: background .15s;
-    }
-    .search-btn:hover { background: #a93226; }
-
-    .option-row { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; font-size: 14px; color: var(--ink-2); }
-    .toggle {
-      appearance: none; width: 44px; height: 26px; flex-shrink: 0;
-      background: #ddd; border-radius: 999px; border: 2px solid #ccc;
-      position: relative; cursor: pointer; transition: background .2s, border-color .2s;
-    }
-    .toggle::after {
-      content: ""; width: 18px; height: 18px; border-radius: 50%;
-      background: #fff; position: absolute; top: 2px; left: 2px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s;
-    }
-    .toggle:checked { background: var(--accent); border-color: var(--accent); }
-    .toggle:checked::after { left: 22px; }
-    .option-row strong { color: var(--ink); }
-    .query-expanded { margin-top: .6rem; font-size: 13px; color: var(--ink-3); }
-    .query-expanded strong { color: var(--ink-2); }
-
-    /* ── METRICS PANEL ── */
-    .metrics-panel {
-      background: var(--surface);
+      flex: 1;
+      padding: 0.75rem 1.25rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .metrics-head {
-      background: var(--ink);
-      padding: 1.1rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .metrics-head-left { display: flex; align-items: center; gap: .75rem; }
-    .metrics-icon {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: rgba(255,255,255,.08);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .metrics-label { font-weight: 700; font-size: 1rem; color: #fff; }
-    .metrics-query { font-family: 'Playfair Display', serif; font-style: italic; color: #8a8a8a; font-size: .95rem; }
-
-    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
-    .metric-cell { background: var(--surface); padding: 1.4rem; text-align: center; }
-    .metric-kicker { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: .5rem; }
-    .metric-value { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 700; line-height: 1; margin-bottom: .4rem; }
-    .metric-value.green { color: var(--green); }
-    .metric-value.orange { color: var(--orange); }
-    .metric-value.blue { color: var(--blue); }
-    .metric-sub { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
-
-    .confusion-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
-    .conf-cell { padding: 1.1rem; text-align: center; }
-    .conf-cell h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; margin-bottom: .25rem; }
-    .conf-cell strong { display: block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .2rem; }
-    .conf-cell span { font-size: 12px; }
-    .tp { background: var(--green-soft); color: var(--green); }
-    .fp { background: #fff0f1; color: #b91c1c; }
-    .fn { background: var(--orange-soft); color: var(--orange); }
-    .tr { background: var(--blue-soft); color: var(--blue); }
-
-    .formula-row {
-      padding: .9rem 1.5rem;
-      font-size: 12px; color: var(--ink-3);
-      border-top: 1px solid var(--border);
-      font-family: 'Courier New', monospace;
       background: var(--bg);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--primary); outline: none; }
+    .btn-search {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .btn-search:hover { background: var(--primary-hover); }
+
+    /* CHECKBOX MURNI */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .checkbox-input {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .expanded-info {
+      margin-top: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.85rem;
+      border-radius: 4px;
+      display: inline-block;
+      border: 1px solid #f2d7d5;
     }
 
-    /* ── RESULT CARDS ── */
-    .results-header { display: flex; align-items: baseline; gap: .75rem; }
-    .results-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); }
-    .results-title em { font-style: italic; color: var(--accent); }
-    .results-count { font-size: 13px; color: var(--ink-3); }
-
-    .result-list { display: flex; flex-direction: column; gap: .75rem; }
-
-    .card {
+    /* ── METRICS SECTION ── */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .metric-card {
       background: var(--surface);
       border: 1px solid var(--border);
+      padding: 1.5rem;
       border-radius: var(--radius);
-      padding: 1.4rem;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow .15s, border-color .15s;
+      box-shadow: var(--shadow);
+      text-align: left;
+      border-top: 4px solid var(--primary);
     }
-    .card:hover { box-shadow: var(--shadow-md); border-color: #d0c9c0; }
+    .metric-card.success { border-top-color: var(--success); }
+    .metric-card.warning { border-top-color: var(--warning); }
+    .metric-card.info { border-top-color: var(--info); }
+    
+    .m-title { font-size: 0.75rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    .m-value { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: var(--text-main); line-height: 1; margin-bottom: 0.5rem; }
+    .m-value.c-success { color: var(--success); }
+    .m-value.c-warning { color: var(--warning); }
+    .m-value.c-info { color: var(--info); }
+    .m-desc { font-size: 0.8rem; color: var(--text-muted); }
 
-    .card-meta { display: flex; align-items: center; gap: .6rem; margin-bottom: .75rem; }
-    .rank-badge {
-      font-size: 11px; font-weight: 700; letter-spacing: .06em;
-      color: var(--accent); background: var(--accent-soft);
-      border-radius: 999px; padding: 4px 10px;
+    .confusion-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
-    .score-wrap { display: flex; align-items: center; gap: 6px; }
-    .score-bar-bg { width: 56px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
-    .score-bar-fill { height: 100%; background: var(--green); border-radius: 99px; }
-    .score-text { font-size: 11px; font-weight: 600; color: var(--green); }
-
-    .card-title { font-size: 1.05rem; font-weight: 600; color: var(--ink); line-height: 1.4; margin-bottom: .5rem; }
-    .card-title a { text-decoration: none; color: inherit; }
-    .card-title a:hover { color: var(--accent); }
-    .card-snippet { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; margin-bottom: .85rem; }
-    .card-read { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
-    .card-read:hover { text-decoration: underline; }
-
-    .empty-state {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 3.5rem 2rem; text-align: center;
+    .conf-card {
+      background: var(--surface);
+      padding: 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
     }
-    .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--ink); margin-bottom: .5rem; }
-    .empty-state p { font-size: 14px; color: var(--ink-3); }
+    .conf-val { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .conf-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .conf-desc { font-size: 0.75rem; color: var(--text-muted); }
 
-    @media (max-width: 720px) {
-      .nav { padding: 1rem; }
-      .page { padding: 1.25rem 1rem 4rem; }
+    .c-tp { background: var(--success-soft); color: var(--success); border-color: #bbf7d0; }
+    .c-fp { background: var(--danger-soft); color: var(--danger); border-color: #fecaca; }
+    .c-fn { background: var(--warning-soft); color: var(--warning); border-color: #fde68a; }
+    .c-tr { background: var(--info-soft); color: var(--info); border-color: #bfdbfe; }
+
+    /* ── RESULTS SECTION ── */
+    .results-list { display: flex; flex-direction: column; gap: 1rem; }
+    .result-item {
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: grid;
+      grid-template-columns: 45px 1fr;
+      gap: 1.25rem;
+    }
+    .result-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      border-color: #d0c9c0;
+    }
+    .rank-circle {
+      width: 45px; height: 45px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem; color: var(--primary);
+    }
+    .item-content h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.5rem; font-weight: 700; }
+    .item-content h3 a { color: var(--text-main); text-decoration: none; }
+    .item-content h3 a:hover { color: var(--primary); }
+    .item-snippet { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; }
+    
+    .item-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--bg); padding-top: 0.75rem; }
+    .score-badge { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--success); }
+    .score-bar { width: 60px; height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .score-fill { height: 100%; background: var(--success); }
+    .read-more { font-size: 0.85rem; font-weight: 600; color: var(--primary); text-decoration: none; }
+    .read-more:hover { text-decoration: underline; }
+
+    .empty-box {
+      text-align: center; padding: 3.5rem; background: var(--surface); border: 1px dashed var(--text-light); border-radius: var(--radius);
+    }
+
+    @media (max-width: 768px) {
       .metrics-grid { grid-template-columns: 1fr; }
       .confusion-grid { grid-template-columns: 1fr 1fr; }
-      .metrics-head { flex-direction: column; align-items: flex-start; }
-      .form-row { flex-wrap: wrap; }
-      .search-btn { width: 100%; justify-content: center; }
+      .search-box { flex-direction: column; }
+      .btn-search { padding: 0.75rem; }
+      .result-item { grid-template-columns: 1fr; gap: 1rem; }
+      .rank-circle { width: 36px; height: 36px; font-size: 0.9rem; }
+      .nav-stats { display: none; }
     }
   </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a class="brand" href="/">Berita <em>Tempo</em></a>
-  <div class="nav-right">
-    <span class="badge">{{ total_artikel }} artikel</span>
-    <span class="badge">{{ total_kata_unik }} kata unik</span>
-    <a class="btn-back" href="/">← Kembali</a>
+<nav class="navbar">
+  <a class="brand-logo" href="/">Berita<span>Tempo</span></a>
+  <div class="nav-stats">
+    <div class="stat-badge">{{ total_artikel }} Artikel Tersedia</div>
+    <div class="stat-badge">{{ total_kata_unik }} Kata Unik</div>
+    <a class="btn-outline" href="/">Kembali</a>
   </div>
 </nav>
 
-<div class="page">
+<div class="container">
 
-  <!-- Search -->
-  <div class="search-card">
+  <div class="search-wrapper">
     <form action="/search" method="POST">
-      <div class="form-row">
-        <div class="search-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </div>
-        <input class="search-input" type="text" name="query" value="{{ query }}" placeholder="Cari berita…" required>
-        <button class="search-btn" type="submit">Cari →</button>
+      <div class="search-box">
+        <input class="search-input" type="text" name="query" value="{{ query }}" placeholder="Ketik kata kunci pencarian..." required>
+        <button class="btn-search" type="submit">Cari Data &rarr;</button>
       </div>
-      <label class="option-row">
-        <input class="toggle" type="checkbox" name="use_synonym" {% if use_synonym %}checked{% endif %}>
-        <span><strong>Query Expansion</strong> — pencarian dengan sinonim</span>
+      
+      <label class="checkbox-container">
+        <input class="checkbox-input" type="checkbox" name="use_synonym" {% if use_synonym %}checked{% endif %}>
+        Gunakan <strong>Query Expansion</strong> (Pencarian berbasis sinonim kata)
       </label>
     </form>
+    
     {% if use_synonym %}
-    <p class="query-expanded">Query diperluas: <strong>{{ query_final }}</strong></p>
+    <div class="expanded-info">
+      Query diperluas menjadi: <strong>{{ query_final }}</strong>
+    </div>
     {% endif %}
   </div>
 
-  <!-- Metrics -->
-  <div class="metrics-panel">
-    <div class="metrics-head">
-      <div class="metrics-head-left">
-        <div class="metrics-icon">⌁</div>
-        <span class="metrics-label">Evaluasi Kinerja</span>
-      </div>
-      <span class="metrics-query">"{{ query }}"</span>
-    </div>
+  <h2 class="section-title">
+    Evaluasi Metrik: "<em>{{ query }}</em>"
+  </h2>
 
-    <div class="metrics-grid">
-      <div class="metric-cell">
-        <div class="metric-kicker">Precision</div>
-        <div class="metric-value green">{{ metrics.precision }}%</div>
-        <div class="metric-sub">{{ metrics.tp }} / {{ metrics.retrieved }}<br>Dokumen relevan terambil</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-kicker">Recall</div>
-        <div class="metric-value orange">{{ metrics.recall }}%</div>
-        <div class="metric-sub">{{ metrics.tp }} / {{ metrics.total_relevant }}<br>Dari total relevan</div>
-      </div>
-      <div class="metric-cell">
-        <div class="metric-kicker">F1-Score</div>
-        <div class="metric-value blue">{{ metrics.f1 }}%</div>
-        <div class="metric-sub">Harmonic mean<br>Precision dan Recall</div>
-      </div>
+  <div class="metrics-grid">
+    <div class="metric-card success">
+      <div class="m-title">Precision</div>
+      <div class="m-value c-success">{{ metrics.precision }}%</div>
+      <div class="m-desc"><strong>{{ metrics.tp }} dari {{ metrics.retrieved }}</strong> dokumen terambil yang relevan.</div>
     </div>
-
-    <div class="confusion-grid">
-      <div class="conf-cell tp"><h3>{{ metrics.tp }}</h3><strong>True Positive</strong><span>Relevan + Terambil</span></div>
-      <div class="conf-cell fp"><h3>{{ metrics.fp }}</h3><strong>False Positive</strong><span>Tidak Relevan + Terambil</span></div>
-      <div class="conf-cell fn"><h3>{{ metrics.fn }}</h3><strong>False Negative</strong><span>Relevan + Tidak Terambil</span></div>
-      <div class="conf-cell tr"><h3>{{ metrics.total_relevant }}</h3><strong>Total Relevan</strong><span>Ground Truth DB</span></div>
+    <div class="metric-card warning">
+      <div class="m-title">Recall</div>
+      <div class="m-value c-warning">{{ metrics.recall }}%</div>
+      <div class="m-desc"><strong>{{ metrics.tp }} dari {{ metrics.total_relevant }}</strong> total dokumen relevan ditemukan.</div>
     </div>
-
-    <div class="formula-row">
-      Precision = TP / (TP+FP) &nbsp;·&nbsp; Recall = TP / (TP+FN) &nbsp;·&nbsp; F1 = 2×P×R / (P+R)
+    <div class="metric-card info">
+      <div class="m-title">F1-Score</div>
+      <div class="m-value c-info">{{ metrics.f1 }}%</div>
+      <div class="m-desc">Rata-rata harmonik antara Precision dan Recall.</div>
     </div>
   </div>
 
-  <!-- Results -->
-  <div class="results-header">
-    <h2 class="results-title">Hasil untuk: "<em>{{ query }}</em>"</h2>
-    {% if results %}<span class="results-count">{{ results|length }} berita</span>{% endif %}
+  <div class="confusion-grid">
+    <div class="conf-card c-tp">
+      <span class="conf-val">{{ metrics.tp }}</span>
+      <span class="conf-label">True Positive</span>
+      <span class="conf-desc">Relevan & Terambil</span>
+    </div>
+    <div class="conf-card c-fp">
+      <span class="conf-val">{{ metrics.fp }}</span>
+      <span class="conf-label">False Positive</span>
+      <span class="conf-desc">Tidak Relevan & Terambil</span>
+    </div>
+    <div class="conf-card c-fn">
+      <span class="conf-val">{{ metrics.fn }}</span>
+      <span class="conf-label">False Negative</span>
+      <span class="conf-desc">Relevan & Tidak Terambil</span>
+    </div>
+    <div class="conf-card c-tr">
+      <span class="conf-val">{{ metrics.total_relevant }}</span>
+      <span class="conf-label">Ground Truth</span>
+      <span class="conf-desc">Total Data Relevan</span>
+    </div>
   </div>
 
-  <div class="result-list">
+  <h2 class="section-title" style="margin-top: 2rem;">
+    Hasil Pencarian
+    {% if results %}<span style="font-size: 0.9rem; color: var(--text-light); font-weight: 400; font-family: 'Inter', sans-serif;">({{ results|length }} temuan)</span>{% endif %}
+  </h2>
+
+  <div class="results-list">
     {% if results %}
       {% for item in results %}
-      <article class="card">
-        <div class="card-meta">
-          <span class="rank-badge">#{{ loop.index }}</span>
-          <div class="score-wrap">
-            <div class="score-bar-bg">
-              <div class="score-bar-fill" style="width:{{ (item.skor * 100)|round|int }}%"></div>
+      <div class="result-item">
+        <div class="rank-circle">#{{ loop.index }}</div>
+        <div class="item-content">
+          <h3><a href="{{ item.url }}" target="_blank">{{ item.judul }}</a></h3>
+          <p class="item-snippet">{{ item.isi }}</p>
+          <div class="item-footer">
+            <div class="score-badge">
+              Skor: {{ item.skor }}
+              <div class="score-bar">
+                <div class="score-fill" style="width:{{ (item.skor * 100)|round|int }}%"></div>
+              </div>
             </div>
-            <span class="score-text">{{ item.skor }}</span>
+            <a class="read-more" href="{{ item.url }}" target="_blank">Baca Artikel &rarr;</a>
           </div>
         </div>
-        <h2 class="card-title"><a href="{{ item.url }}" target="_blank">{{ item.judul }}</a></h2>
-        <p class="card-snippet">{{ item.isi }}</p>
-        <a class="card-read" href="{{ item.url }}" target="_blank">Baca di Tempo →</a>
-      </article>
+      </div>
       {% endfor %}
     {% else %}
-      <div class="empty-state">
-        <h2>Tidak ada hasil relevan.</h2>
-        <p>Coba kata kunci lain atau aktifkan Query Expansion.</p>
+      <div class="empty-box">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-main); margin-bottom: 0.5rem;">Tidak Ditemukan Hasil</h3>
+        <p style="color: var(--text-muted);">Silakan coba gunakan kata kunci yang berbeda atau aktifkan fitur Query Expansion.</p>
       </div>
     {% endif %}
   </div>
 
 </div>
+
 </body>
 </html>
