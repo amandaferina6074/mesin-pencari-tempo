@@ -44,12 +44,13 @@ TOTAL_KATA_UNIK = len(vectorizer.get_feature_names_out())
 # 3. QUERY EXPANSION
 # ==========================================
 def load_thesaurus():
-    default_synonyms = {
+    # KAMUS DIKUNCI MATI DI SINI. FUNGSI BACA .PKL DIHAPUS TOTAL.
+    return {
         "ekonomi": ["finansial", "keuangan", "moneter", "pasar", "investasi"],
         "prabowo": ["menteri", "presiden", "tokoh", "politik", "subianto"],
         "indonesia": ["nusantara", "republik", "nasional", "negara"],
-        "perang": ["konflik", "serang", "militer", "tempur"], # <--- Sudah diubah ke kata dasar "serang"
-        "iran": ["teheran", "persia", "timur", "tengah"], # <--- Dipisah agar lebih aman dibaca mesin
+        "perang": ["konflik", "serang", "militer", "tempur"], 
+        "iran": ["teheran", "persia", "timur", "tengah"],
         "politik": ["pemerintah", "pemilu", "partai", "kebijakan", "demokrasi"],
         "pemilu": ["pilpres", "pileg", "pemilihan", "kampanye"],
         "teknologi": ["digital", "internet", "aplikasi", "inovasi"],
@@ -58,29 +59,6 @@ def load_thesaurus():
         "penipuan online": ["siber", "cyber", "ilegal", "polisi", "imigrasi", "kriminal", "kejahatan"],
         "pendidikan": ["guru", "sekolah", "pelatihan", "siswa", "belajar"]
     }
-
-    path = BASE_DIR / "thesaurus_berita_tempo.pkl"
-
-    if path.exists():
-        try:
-            with open(path, "rb") as f:
-                obj = pickle.load(f)
-
-            if isinstance(obj, dict):
-                cleaned = {}
-                for key, value in obj.items():
-                    if isinstance(value, (list, tuple, set)):
-                        cleaned[str(key).lower()] = [str(v).lower() for v in value]
-                    else:
-                        cleaned[str(key).lower()] = str(value).lower().split()
-
-                default_synonyms.update(cleaned)
-
-        except Exception:
-            pass
-
-    return default_synonyms
-
 
 SYNONYMS = load_thesaurus()
 
@@ -102,7 +80,7 @@ def expand_query(query: str) -> str:
         if word in SYNONYMS:
             expanded.extend(SYNONYMS[word])
 
-    # 2. Perluas sinonim untuk frasa utuh (misal: "perang iran")
+    # 2. Perluas sinonim untuk frasa utuh
     query_normalized = normalize_text(query)
     if query_normalized in SYNONYMS:
         expanded.extend(SYNONYMS[query_normalized])
@@ -111,22 +89,11 @@ def expand_query(query: str) -> str:
     return " ".join(set(expanded))
 
 # ==========================================
-# 4. GROUND TRUTH MANUAL
+# 4. GROUND TRUTH MANUAL & EVALUASI
 # ==========================================
-# Ground truth ini digunakan untuk query pengujian BAB IV.
-# Indeks di bawah disesuaikan dengan skenario pengujian sistem.
-
 GROUND_TRUTH = {
-    # Query 1: Prabowo
     "prabowo": [0, 1, 2, 3],
-
-    # Query 2: Iran
-    "iran": [
-        0, 1, 2, 3, 4, 5, 6, 7, 8,
-        9, 10, 11, 12, 13, 14, 15, 16, 17
-    ],
-
-    # Query 3: Politik
+    "iran": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
     "politik": [0, 1, 2],
 }
 
